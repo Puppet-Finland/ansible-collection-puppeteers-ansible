@@ -1,0 +1,46 @@
+- name: Validate parameters
+  ansible.builtin.assert:
+    that:
+      - puppeteers_ansible_rulebook_user is string
+      - puppeteers_ansible_rulebook_user_authorized_keys is not string and puppeteers_ansible_rulebook_user_authorized_keys is not mapping and puppeteers_ansible_rulebook_user_authorized_keys is iterable
+      - puppeteers_ansible_rulebook_manage_firewalld is boolean
+
+- name: Create eda user
+  ansible.builtin.user:
+    name: "{{ puppeteers_ansible_rulebook_user }}"
+    comment: "User for running ansible-rulebook"
+    create_home: true
+
+- name: Add authorized_key for eda user
+  ansible.posix.authorized_key:
+    user: eda
+    key: "{{ item }}"
+  loop: "{{ puppeteers_ansible_rulebook_user_authorized_keys }}"
+
+- name: Ensure that podman is installed
+  ansible.builtin.package:
+    name: podman
+    state: present
+
+- name: Install acl to ensure that Ansible is able to run as eda user
+  ansible.builtin.package:
+    name: acl
+    state: present
+
+- name: Ensure that ansible-rulebook image is present
+  containers.podman.podman_image:
+    name: "{{ puppeteers_ansible_rulebook_image }}"
+    tag: "{{ puppeteers_ansible_rulebook_image_tag }}"
+    state: present
+  become: true
+  become_user: "{{ puppeteers_ansible_rulebook_user }}"
+
+- name: Create eda firewalld zone
+  ansible.builtin.import_role:
+    name: puppeteers.firewall.zone
+  vars:
+    puppeteers_firewall_zone_name: "{{ puppeteers_ansible_rulebook_firewalld_zone_name }}"
+    puppeteers_firewall_zone_source: "{{ puppeteers_ansible_rulebook_firewalld_source }}"
+    puppeteers_firewall_zone_source_allow_ports: "{{ puppeteers_ansible_rulebook_firewalld_ports }}"
+    puppeteers_firewall_zone_source_allow_services: []
+  when: puppeteers_ansible_rulebook_manage_firewalld

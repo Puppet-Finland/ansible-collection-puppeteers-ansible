@@ -1,0 +1,7 @@
+---
+puppeteers_ansible_rulebook_user: eda
+puppeteers_ansible_rulebook_image: quay.io/ansible/ansible-rulebook
+puppeteers_ansible_rulebook_image_tag: v1.3.0
+puppeteers_ansible_rulebook_manage_firewalld: false
+puppeteers_ansible_rulebook_firewalld_zone_name: 15_eda
+
