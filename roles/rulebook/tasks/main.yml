@@ -27,6 +27,19 @@
     name: acl
     state: present
 
+- name: Install pip
+  ansible.builtin.package:
+    name: python3-pip
+    state: present
+
+- name: Install ansible-builder
+  ansible.builtin.pip:
+    name: ansible-builder
+    state: present
+    extra_args: --user
+  become: true
+  become_user: "{{ puppeteers_ansible_rulebook_user }}"
+
 - name: Ensure that ansible-rulebook image is present
   containers.podman.podman_image:
     name: "{{ puppeteers_ansible_rulebook_image }}"
