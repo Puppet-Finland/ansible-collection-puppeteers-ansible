@@ -1,0 +1,20 @@
+- name: Validate parameters
+  ansible.builtin.assert:
+    that:
+      - puppeteers_ansible_rulebook_target_user is string
+      - puppeteers_ansible_rulebook_target_user_groups is not string and puppeteers_ansible_rulebook_target_user_groups is not mapping and puppeteers_ansible_rulebook_target_user_groups is iterable
+      - puppeteers_ansible_rulebook_target_user_authorized_keys is not string and puppeteers_ansible_rulebook_target_user_authorized_keys is not mapping and puppeteers_ansible_rulebook_target_user_authorized_keys is iterable
+
+- name: Create eda user
+  ansible.builtin.user:
+    name: "{{ puppeteers_ansible_rulebook_target_user }}"
+    groups: "{{ puppeteers_ansible_rulebook_target_user_groups }}"
+    comment: "Used for connections from ansible-rulebook"
+    create_home: true
+
+- name: Add authorized_key for eda user
+  ansible.posix.authorized_key:
+    user: "{{ puppeteers_ansible_rulebook_target_user }}"
+    key: "{{ item['key'] }}"
+    key_options: "{{ item['key_options'] }}"
+  loop: "{{ puppeteers_ansible_rulebook_target_user_authorized_keys }}"

@@ -22,3 +22,24 @@ following parameters:
 There are several optional parameters available as well. Please refer to
 [roles/rulebook/defaults/main.yml](roles/rulebook/defaults/main.yml) for
 details.
+
+## puppeteers.ansible.rulebook_target
+
+This role enables SSH access from ansible-rulebook, or rather, ansible runner
+launched by it. It creates a dedicated system user and puts one or more
+authorized SSH keys into ~/.ssh/authorized_keys with optional key options (e.g.
+from="10.0.0.1"). Limiting privileges for the user beyond group membership is
+outside of the scope of this role. This role has three paramaters:
+
+    **puppeteers_ansible_rulebook_target_user_authorized_keys**: list of authorized SSH keys to allow access with (mandatory, see usage below)
+    **puppeteers_ansible_rulebook_target_user**: name of the system user to create (optional, default: *eda*)
+    **puppeteers_ansible_rulebook_target_user_groups**: list of additional groups to add the user to (optional, default: [])
+
+The *puppeteers_ansible_rulebook_target_user_authorized_keys* parameter expects
+the following format:
+
+    puppeteers_ansible_rulebook_target_user_authorized_keys:
+      - key: "key-type first-key-content comment"
+        key_options: ""
+      - key: "key-type second-key-content comment"
+        key_options: "from=\"10.0.0.5\""
