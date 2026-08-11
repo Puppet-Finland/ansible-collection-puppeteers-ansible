@@ -11,9 +11,13 @@
     comment: "User for running ansible-rulebook"
     create_home: true
 
+- name: Enable lingering for the eda user
+  ansible.builtin.command:
+    cmd: "loginctl enable-linger {{ puppeteers_ansible_rulebook_user }}"
+
 - name: Add authorized_key for eda user
   ansible.posix.authorized_key:
-    user: eda
+    user: "{{ puppeteers_ansible_rulebook_user }}"
     key: "{{ item }}"
   loop: "{{ puppeteers_ansible_rulebook_user_authorized_keys }}"
 
