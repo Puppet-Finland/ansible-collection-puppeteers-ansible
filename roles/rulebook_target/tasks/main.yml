@@ -11,6 +11,16 @@
     groups: "{{ puppeteers_ansible_rulebook_target_user_groups }}"
     comment: "Used for connections from ansible-rulebook"
     create_home: true
+  when: ansible_facts['distribution_version'] != "18.04"
+
+- name: Create eda user for Ubuntu 18.04
+  ansible.builtin.user:
+    name: "{{ puppeteers_ansible_rulebook_target_user }}"
+    groups: "{{ puppeteers_ansible_rulebook_target_user_groups }}"
+    comment: "Used for connections from ansible-rulebook"
+    create_home: true
+    password: '*'
+  when: ansible_facts['distribution_version'] == "18.04"
 
 - name: Add authorized_key for eda user
   ansible.posix.authorized_key:
